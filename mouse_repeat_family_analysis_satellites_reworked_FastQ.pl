@@ -6,7 +6,7 @@ use Getopt::Long;
 $|++;
 
 ## this script takes in Illumina sequence files and aligns them the all classes of mouse repeats individually.
-## last modified on Jan 2015 to run on the cluster
+## last modified on June 16, 2021 to run on the cluster
 
 
 my $bowtie2;
@@ -83,7 +83,10 @@ sub align_fragments_to_the_mouse_repeatome {
 	},
 	{ name => 'telomere',
 	  repeat_index => '/bi/scratch/Genomes/Mouse/GRCm38/Repeatome/repeat_families_N_separated/telomere/telomere',
-	}, 
+	},
+  { 	name => 'IAP',
+			repeat_index => '/bi/scratch/Genomes/Mouse/NCBIM37/Repeatome/IAP/IAP',
+  }, 
 	);
   
   # Now starting 12 instances of Bowtie feeding in the sequence file, one for every type of repeat and reading in the sequence identifier for the first
