@@ -30,7 +30,7 @@ def submain():
     # read_indexes()
     
     print (f"Python version: {sys.version}.")
-    allfiles = glob("*_merged_*fastq.gz")
+    allfiles = glob("*merged*fastq.gz")
 
     # print (allfiles)
     allfiles.sort() # required as glob doesn't necessarily store files in alphabetical order
