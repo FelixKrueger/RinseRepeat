@@ -1,0 +1,107 @@
+---
+title: "Repeat mapping 220121"
+output: html_notebook
+---
+
+Felix mapped Oana's TrimAway RNA-seq data (that’s sample 5445, lane 7711) to the repeatome. This produces a repeat family summary report. Can I make a plotting script for this.
+
+Packages and options
+
+```{r}
+library(tidyverse)
+```
+Plotting options
+
+```{r}
+theme_set(theme_bw(base_size = 16))
+```
+
+Importing repeat summary file
+
+```{r}
+read_tsv("../data/repeat_family_summary_report.txt") -> repeats_import
+```
+Tidying
+
+```{r}
+repeats_import %>% 
+  pivot_longer(2:last_col()) %>% 
+  pivot_wider(names_from = "...1", values_from = "value") %>% 
+  mutate(name = str_sub(name, 28, 30)) %>% 
+  pivot_longer(2:14, names_to = "repeat_class", values_to = "counts") %>% 
+  mutate(percent_total = counts/Total*100) -> repeats
+
+head(repeats)
+```
+
+Plotting
+
+```{r, fig.width=10, fig.height=8}
+repeats %>% 
+  filter(repeat_class != "telomere") %>% 
+  ggplot(aes(name, percent_total, fill = name)) +
+  geom_col(position = "dodge") +
+  facet_wrap(facets = "repeat_class", ncol = 3) +
+  ylim(0,20) +
+  theme(legend.position = "none", axis.title.x = element_blank(), axis.text.x = element_blank(), panel.grid = element_blank(), axis.ticks.x = element_blank())
+```
+
+Annotating the samples
+
+```{r}
+read_csv("../data/sample_annotations.csv") -> samples_import
+
+samples_import %>% 
+  rename(sample = `...2`) -> samples
+```
+
+Merging
+
+```{r}
+repeats %>% 
+  left_join(samples) %>% 
+  filter(sample != "no-embryo") %>% 
+  filter(sample != "no_embryo") %>%
+  filter(sample != "Uninjected_rep4") %>% 
+  filter(sample != "1 cell_arrested") %>% 
+  filter(sample != "IgG_rep3_RLT") %>% 
+  filter(sample != "Uninjected_rep1")  -> repeats_filtered
+
+repeats_filtered %>% 
+  group_by(sample) %>% 
+  count()
+```
+
+Plotting
+
+```{r, fig.width=10, fig.height=8}
+repeats_filtered %>% 
+  arrange(sample) %>% 
+  filter(repeat_class != "telomere") %>% 
+  ggplot(aes(name, percent_total, fill = sample)) +
+  geom_col(position = "dodge") +
+  facet_wrap(facets = "repeat_class", ncol = 3) +
+  ylim(0,20) +
+  theme(legend.position = "none", axis.title.x = element_blank(), axis.text.x = element_blank(), panel.grid = element_blank(), axis.ticks.x = element_blank())
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
